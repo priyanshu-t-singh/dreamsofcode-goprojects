@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/mergestat/timediff"
 	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/01.5-todo-list-sqlite/internal/tasks"
@@ -38,7 +39,10 @@ var listCmd = &cobra.Command{
 			timeDiff := timediff.TimeDiff(task.CreatedAt)
 			var dueTimeDiff string = "-"
 			if task.DueDate != nil {
-				dueTimeDiff = timediff.TimeDiff(*task.DueDate)
+				// offset the due date to the end of day
+				offsetDuration, _ := time.ParseDuration("23h59m")
+				offsetDate := task.DueDate.Add(offsetDuration)
+				dueTimeDiff = timediff.TimeDiff(offsetDate)
 			}
 
 			if showAll {

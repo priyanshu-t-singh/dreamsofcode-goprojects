@@ -58,13 +58,11 @@ func (r *Repository) MarkAsCompleted(taskId string) error {
 	query := `UPDATE tasks SET completed_at = ? WHERE id = ?`
 	completedAt := time.Now().UTC()
 	_, err := r.db.Exec(query, completedAt, taskId)
-	if err != nil {
-		return fmt.Errorf("failed to update task: %w", err)
-	}
-
-	return nil
+	return err
 }
 
-// func (r *Repository) Delete() (int, error) {
-
-// }
+func (r *Repository) Delete(taskId string) error {
+	query := "DELETE FROM tasks WHERE id = ?"
+	_, err := r.db.Exec(query, taskId)
+	return err
+}
