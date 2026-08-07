@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Blank-09/dreamsofcode-goprojects/01-todo-list/constants"
-	"github.com/Blank-09/dreamsofcode-goprojects/01-todo-list/internal/csv_handler"
-	"github.com/Blank-09/dreamsofcode-goprojects/01-todo-list/internal/model"
+	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/01-todo-list/constants"
+	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/01-todo-list/internal/csv_handler"
+	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/01-todo-list/internal/model"
 	"github.com/spf13/cobra"
 )
 

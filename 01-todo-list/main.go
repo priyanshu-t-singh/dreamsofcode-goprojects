@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Blank-09/dreamsofcode-goprojects/01-todo-list/cmd"
+	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/01-todo-list/cmd"
 )
 
 func main() {

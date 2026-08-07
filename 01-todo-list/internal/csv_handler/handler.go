@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/Blank-09/dreamsofcode-goprojects/01-todo-list/internal/model"
+	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/01-todo-list/internal/model"
 )
 
 type CSVHandler struct{}
