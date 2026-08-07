@@ -4,6 +4,7 @@ go 1.26.5
 
 require (
 	github.com/mattn/go-sqlite3 v1.14.49
+	github.com/mergestat/timediff v0.0.4
 	github.com/spf13/cobra v1.10.2
 )
 
