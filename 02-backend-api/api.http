@@ -1,0 +1,50 @@
+### Add
+POST http://localhost:8080/add
+Content-Type: application/json
+
+{
+    "a": 1,
+    "b": 2
+}
+
+### Subtract
+POST http://localhost:8080/subtract
+Content-Type: application/json
+
+{
+    "a": 1,
+    "b": 2
+}
+
+### Multiply
+POST http://localhost:8080/multiply
+Content-Type: application/json
+
+{
+    "a": 5,
+    "b": 2
+}
+
+### Divide
+POST http://localhost:8080/divide
+Content-Type: application/json
+
+{
+    "dividend": 10,
+    "divisor": 2
+}
+
+### Divide - division by zero
+POST http://localhost:8080/divide
+Content-Type: application/json
+
+{
+    "dividend": 10,
+    "divisor": 0
+}
+
+### Sum
+POST http://localhost:8080/sum
+Content-Type: application/json
+
+[2, 3, 5, 7]
