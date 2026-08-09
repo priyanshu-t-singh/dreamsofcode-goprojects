@@ -6,12 +6,12 @@ import (
 	"net/http"
 
 	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/02-backend-api/internal/arithmetics"
-	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/02-backend-api/internal/core"
+	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/02-backend-api/internal/core/logger"
 	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/02-backend-api/internal/middleware"
 )
 
 func main() {
-	core.SetupLogger()
+	logger.SetupLogger()
 	router := http.NewServeMux()
 	v1 := http.NewServeMux()
 
@@ -25,6 +25,7 @@ func main() {
 	server := http.Server{
 		Addr: ":8080",
 		Handler: middleware.CreateStack(
+			middleware.RequestID,
 			middleware.AllowCors,
 			middleware.Logging,
 		)(router),
