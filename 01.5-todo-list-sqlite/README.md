@@ -140,6 +140,6 @@ func closeFile(f *os.File) error {
 
 ## Extra Features
 
-- Change the IsComplete property of the Task data model to use a timestamp instead, which gives further information.
-- Change from CSV to JSON, JSONL or SQLite
-- Add in an optional due date to the tasks
+- [x] Change the IsComplete property of the Task data model to use a timestamp instead, which gives further information.
+- [x] Change from CSV to JSON, JSONL or SQLite
+- [x] Add in an optional due date to the tasks
