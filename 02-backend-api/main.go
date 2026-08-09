@@ -4,32 +4,32 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
-	"os"
 
 	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/02-backend-api/internal/arithmetics"
+	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/02-backend-api/internal/core"
 	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/02-backend-api/internal/middleware"
 )
 
 func main() {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	handler := &arithmetics.Handler{}
+	core.SetupLogger()
 	router := http.NewServeMux()
+	v1 := http.NewServeMux()
 
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Calculator App is running")
 	})
 
-	router.HandleFunc("POST /add", handler.Add)
-	router.HandleFunc("POST /subtract", handler.Subtract)
-	router.HandleFunc("POST /multiply", handler.Multiply)
-	router.HandleFunc("POST /divide", handler.Divide)
-	router.HandleFunc("POST /sum", handler.Sum)
+	v1.Handle("/", arithmetics.GetRoutes())
+	router.Handle("/api/v1/", http.StripPrefix("/api/v1", v1))
 
 	server := http.Server{
-		Addr:    ":8080",
-		Handler: middleware.AllowCors(middleware.Logging(logger, router)),
+		Addr: ":8080",
+		Handler: middleware.CreateStack(
+			middleware.AllowCors,
+			middleware.Logging,
+		)(router),
 	}
 
-	logger.Info("Server listening on port :8080")
+	slog.Info("Server listening on port :8080")
 	server.ListenAndServe()
 }

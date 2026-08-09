@@ -16,7 +16,7 @@ func (w *wrappedWriter) WriteHeader(statusCode int) {
 	w.statusCode = statusCode
 }
 
-func Logging(logger *slog.Logger, next http.Handler) http.Handler {
+func Logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
@@ -27,7 +27,7 @@ func Logging(logger *slog.Logger, next http.Handler) http.Handler {
 
 		next.ServeHTTP(wrapped, r)
 
-		logger.Info(
+		slog.Info(
 			"request",
 			slog.String("method", r.Method),
 			slog.String("path", r.URL.Path),
