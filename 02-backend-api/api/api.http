@@ -1,14 +1,16 @@
+@baseUrl = http://localhost:8080/api/v1
+
 ### Add
-POST http://localhost:8080/add
+POST {{baseUrl}}/add
 Content-Type: application/json
 
 {
-    "a": 1,
-    "b": 2
+    "a": 1.11111,
+    "b": 2.327832
 }
 
 ### Subtract
-POST http://localhost:8080/subtract
+POST {{baseUrl}}/subtract
 Content-Type: application/json
 
 {
@@ -17,7 +19,7 @@ Content-Type: application/json
 }
 
 ### Multiply
-POST http://localhost:8080/multiply
+POST {{baseUrl}}/multiply
 Content-Type: application/json
 
 {
@@ -26,16 +28,16 @@ Content-Type: application/json
 }
 
 ### Divide
-POST http://localhost:8080/divide
+POST {{baseUrl}}/divide
 Content-Type: application/json
 
 {
     "dividend": 10,
-    "divisor": 2
+    "divisor": 3
 }
 
 ### Divide - division by zero
-POST http://localhost:8080/divide
+POST {{baseUrl}}/divide
 Content-Type: application/json
 
 {
@@ -44,7 +46,7 @@ Content-Type: application/json
 }
 
 ### Sum
-POST http://localhost:8080/sum
+POST {{baseUrl}}/sum
 Content-Type: application/json
 
 [2, 3, 5, 7]

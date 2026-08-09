@@ -9,17 +9,17 @@ import (
 type Handler struct{}
 
 type RequestBody struct {
-	A int `json:"a"`
-	B int `json:"b"`
+	A float64 `json:"a"`
+	B float64 `json:"b"`
 }
 
 type DivisionRequestBody struct {
-	Dividend int `json:"dividend"`
-	Divisor  int `json:"divisor"`
+	Dividend float64 `json:"dividend"`
+	Divisor  float64 `json:"divisor"`
 }
 
 type ResponseBody struct {
-	Result int `json:"result"`
+	Result float64 `json:"result"`
 }
 
 func (h *Handler) Add(w http.ResponseWriter, r *http.Request) {
@@ -32,7 +32,7 @@ func (h *Handler) Add(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var result int = body.A + body.B
+	var result float64 = body.A + body.B
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -49,7 +49,7 @@ func (h *Handler) Subtract(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var result int = body.A - body.B
+	var result float64 = body.A - body.B
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -66,7 +66,7 @@ func (h *Handler) Multiply(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var result int = body.A * body.B
+	var result float64 = body.A * body.B
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -88,7 +88,7 @@ func (h *Handler) Divide(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var result int = body.Dividend / body.Divisor
+	var result float64 = body.Dividend / body.Divisor
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
@@ -105,9 +105,9 @@ func (h *Handler) Sum(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var result int = 0
+	var result float64 = 0
 	for _, num := range body {
-		result += num
+		result += float64(num)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
