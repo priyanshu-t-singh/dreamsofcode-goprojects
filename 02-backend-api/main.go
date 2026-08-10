@@ -19,7 +19,7 @@ func main() {
 		fmt.Fprint(w, "Calculator App is running")
 	})
 
-	v1.Handle("/", arithmetics.GetRoutes())
+	v1.Handle("/", middleware.IsAuthenticated(arithmetics.GetRoutes()))
 	router.Handle("/api/v1/", http.StripPrefix("/api/v1", v1))
 
 	server := http.Server{
