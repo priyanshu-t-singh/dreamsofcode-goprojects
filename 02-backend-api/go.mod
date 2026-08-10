@@ -7,3 +7,5 @@ require (
 	github.com/lmittmann/tint v1.2.0
 	github.com/rs/cors v1.11.1
 )
+
+require golang.org/x/time v0.15.0

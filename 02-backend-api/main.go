@@ -25,6 +25,7 @@ func main() {
 	server := http.Server{
 		Addr: ":8080",
 		Handler: middleware.CreateStack(
+			middleware.RateLimiter,
 			middleware.RequestID,
 			middleware.AllowCors,
 			middleware.Logging,

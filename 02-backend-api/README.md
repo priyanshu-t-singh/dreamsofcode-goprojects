@@ -57,7 +57,7 @@ You can access my implementation of this API at [https://calculator.dreamsofcode
 
 ## Additional Features
 
-- [ ] Add in rate limiter to prevent misuse of the API
+- [x] Add in rate limiter to prevent misuse of the API
 - [x] Add in token authentication to prevent anyone unauthorized from using the API
 - [ ] Add in a database to keep track of all of the calculations that have taken place
 - [x] Add in support for floating point numbers as well.
