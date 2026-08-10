@@ -25,6 +25,7 @@ type ContextHolder struct {
 	Ctx context.Context
 }
 
+// helper function to pass context from sub route to route
 func UpdateContext(r *http.Request, ctx context.Context) {
 	if holder, ok := r.Context().Value(logContextKey).(*ContextHolder); ok {
 		holder.Ctx = ctx

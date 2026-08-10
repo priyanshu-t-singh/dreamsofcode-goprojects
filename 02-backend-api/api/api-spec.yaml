@@ -3,11 +3,24 @@ info:
   title: Calculator API
   version: 1.0.0
 servers:
-  - url: http://localhost:8080/api/v1
+  - url: http://localhost:8080
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
 paths:
-  /add:
+  /:
+    get:
+      summary: Health Check
+      responses:
+        "200":
+          description: Calculator App is running
+  /api/v1/add:
     post:
       summary: Add two numbers
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -32,9 +45,11 @@ paths:
                   result:
                     type: number
                     format: int
-  /subtract:
+  /api/v1/subtract:
     post:
       summary: Subtract two numbers
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -59,9 +74,11 @@ paths:
                   result:
                     type: number
                     format: int
-  /multiply:
+  /api/v1/multiply:
     post:
       summary: Multiply two numbers
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -86,9 +103,11 @@ paths:
                   result:
                     type: number
                     format: int
-  /divide:
+  /api/v1/divide:
     post:
       summary: Divide two numbers
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -114,9 +133,11 @@ paths:
                     type: number
                     format: int
 
-  /sum:
+  /api/v1/sum:
     post:
       summary: Add all numbers in an array
+      security:
+      - bearerAuth: []
       requestBody:
         required: true
         content:
