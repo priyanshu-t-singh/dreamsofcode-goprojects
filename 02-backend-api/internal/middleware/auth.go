@@ -7,14 +7,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/02-backend-api/internal/core/model"
+	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/02-backend-api/internal/core/models"
 )
 
 const AuthUserID = "middleware.auth.userID"
 
 func writeUnauthenticated(w http.ResponseWriter, msg string) {
 	w.WriteHeader(http.StatusUnauthorized)
-	json.NewEncoder(w).Encode(model.ErrorResponse{Error: msg})
+	json.NewEncoder(w).Encode(models.ErrorResponse{Error: msg})
 }
 
 func IsAuthenticated(next http.Handler) http.Handler {
@@ -42,6 +42,11 @@ func IsAuthenticated(next http.Handler) http.Handler {
 		UpdateContext(r, ctx)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
+}
+
+func GetAuthenticatedUserID(r *http.Request) (string, bool) {
+	userID, ok := r.Context().Value(AuthUserID).(string)
+	return userID, ok
 }
 
 func validateToken(token string) (string, error) {

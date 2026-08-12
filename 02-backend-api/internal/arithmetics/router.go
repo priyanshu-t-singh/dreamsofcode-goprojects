@@ -1,11 +1,14 @@
 package arithmetics
 
 import (
+	"database/sql"
 	"net/http"
 )
 
-func GetRoutes() *http.ServeMux {
-	handler := &Handler{}
+func GetRoutes(db *sql.DB) *http.ServeMux {
+	handler := &Handler{
+		Repository: NewRepository(db),
+	}
 
 	router := http.NewServeMux()
 	router.HandleFunc("POST /add", handler.Add)
