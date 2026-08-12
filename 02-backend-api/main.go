@@ -24,7 +24,7 @@ func main() {
 
 	db, err := database.Open(constants.SqliteDatabasePath)
 	if err != nil {
-		slog.Error("error", err)
+		slog.Error("db failed to open", "err", err)
 		return
 	}
 
@@ -48,7 +48,7 @@ func main() {
 	go func() {
 		slog.Info("Server listening on port :8080")
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			slog.Error("server error", err)
+			slog.Error("server failed to serve", "err", err)
 			os.Exit(1)
 		}
 	}()
@@ -62,10 +62,10 @@ func main() {
 	defer cancel()
 
 	if err := server.Shutdown(ctx); err != nil {
-		slog.Error("server forced to shutdown", err)
+		slog.Error("server forced to shutdown", "err", err)
 	}
 	if err := db.Close(); err != nil {
-		slog.Error("error closing database", err)
+		slog.Error("error closing database", "err", err)
 	}
 	slog.Info("shutdown complete")
 }
