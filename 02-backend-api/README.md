@@ -62,5 +62,5 @@ You can access my implementation of this API at [https://calculator.dreamsofcode
 - [x] Add in a database to keep track of all of the calculations that have taken place
 - [x] Add in support for floating point numbers as well.
 - [ ] Create an associated http client that can work with the calculator API.
-- [ ] Create a frontend that makes use of your API.
+- [x] Create a frontend that makes use of your API.
 - [x] Add in a middleware that adds a request ID to the http.Request object.

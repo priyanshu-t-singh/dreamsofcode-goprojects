@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Calculator</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Calculator API</h1>
+        <div class="status-badge">
+            <span id="status-dot" class="status-dot"></span>
+            <span id="status-text">Checking health...</span>
+        </div>
+    </div>
+
+    <!-- Auth Token -->
+    <div class="auth-section">
+        <label for="bearer-token">Bearer Authorization Token</label>
+        <input type="password" id="bearer-token" placeholder="Paste your Bearer token here...">
+    </div>
+
+    <!-- Tabs -->
+    <div class="tab-group">
+        <div class="tab active" onclick="switchMode('basic')">Basic Operations</div>
+        <div class="tab" onclick="switchMode('sum')">Array Sum</div>
+    </div>
+
+    <!-- Mode 1: Standard Calculator -->
+    <div id="mode-basic" class="calculator-body">
+        <div class="grid-2">
+            <div>
+                <label for="num-a" id="label-a">Value A</label>
+                <input type="number" id="num-a" placeholder="e.g. 10">
+            </div>
+            <div>
+                <label for="num-b" id="label-b">Value B</label>
+                <input type="number" id="num-b" placeholder="e.g. 5">
+            </div>
+        </div>
+
+        <div class="operators">
+            <button class="btn" onclick="executeOp('add')">+</button>
+            <button class="btn" onclick="executeOp('subtract')">−</button>
+            <button class="btn" onclick="executeOp('multiply')">×</button>
+            <button class="btn" onclick="executeOp('divide')">÷</button>
+        </div>
+    </div>
+
+    <!-- Mode 2: Array Sum -->
+    <div id="mode-sum" class="calculator-body hidden">
+        <div>
+            <label for="array-input">Comma-separated Numbers</label>
+            <input type="text" id="array-input" placeholder="e.g. 10, 20, 30, 40">
+        </div>
+        <button class="btn-submit" onclick="executeSum()">Calculate Sum</button>
+    </div>
+
+    <!-- Result Display -->
+    <div class="result-box">
+        <div class="result-label">RESULT</div>
+        <div id="result" class="result-value">0</div>
+    </div>
+</div>
+
+<script src="/static/js/index.js"></script>
+</body>
+</html>
