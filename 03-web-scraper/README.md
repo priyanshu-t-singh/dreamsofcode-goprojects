@@ -32,13 +32,12 @@ This webscraper initially should focus on non JS rendered web pages, which requi
 ## Additional Tasks
 
 ### Concurrency
-Use concurrency to speed up the process. Running each page processing in it's own go routine, and passing the links through a channel to be then filtered or checked.
+- [ ] Use concurrency to speed up the process. Running each page processing in it's own go routine, and passing the links through a channel to be then filtered or checked.
 
 ## Edge Cases
 
 There are a number of different edge cases in this task such as:
 
-- Ensuring that redirects are handled properly
-- Only checking a page once
-- Preventing infinite loops from recursion
-
+- [ ] Ensuring that redirects are handled properly
+- [ ] Only checking a page once
+- [ ] Preventing infinite loops from recursion
