@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 	"time"
 
 	"golang.org/x/net/html"
@@ -16,24 +15,59 @@ var client = &http.Client{
 	Timeout: 10 * time.Second,
 }
 
-var (
-	resultMap = make(map[string]int)
-	mapMutex  sync.Mutex
-)
+type PageResult struct {
+	URL        string
+	StatusCode int
+	NewLinks   []string
+	IsExternal bool
+	Err        error
+}
 
 func main() {
-	url := "http://localhost:8080"
-	var wg sync.WaitGroup
+	startURLStr := "http://localhost:8080"
+	baseURL, err := url.Parse(startURLStr)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	wg.Add(1)
-	go scrapeLinks(url, &wg)
-	wg.Wait()
+	resultsChan := make(chan PageResult)
+	visited := make(map[string]int)
+
+	// Track active workers to know when to exit
+	activeWorkers := 0
+
+	// Start the first worker
+	activeWorkers++
+	visited[startURLStr] = 0 // 0 means "currently processing"
+	go processPage(startURLStr, baseURL, false, resultsChan)
+
+	// Orchestrator Loop
+	for activeWorkers > 0 {
+		res := <-resultsChan
+		activeWorkers--
+
+		if res.Err != nil {
+			visited[res.URL] = -1
+		} else {
+			visited[res.URL] = res.StatusCode
+		}
+
+		for _, link := range res.NewLinks {
+			if _, alreadyVisited := visited[link]; !alreadyVisited {
+				visited[link] = 0
+				activeWorkers++
+
+				isExternal := !strings.HasPrefix(link, baseURL.Scheme+"://"+baseURL.Host)
+				go processPage(link, baseURL, isExternal, resultsChan)
+			}
+		}
+	}
 
 	fmt.Println("-------------------")
 	fmt.Println("Working Links")
 	fmt.Println("-------------------")
-	for url, statusCode := range resultMap {
-		if statusCode < 400 {
+	for url, statusCode := range visited {
+		if statusCode > 0 && statusCode < 400 {
 			fmt.Printf("%d -> %s\n", statusCode, url)
 		}
 	}
@@ -41,114 +75,75 @@ func main() {
 	fmt.Println("-------------------")
 	fmt.Println("Dead Links")
 	fmt.Println("-------------------")
-	for url, statusCode := range resultMap {
-		if statusCode >= 400 {
+	for url, statusCode := range visited {
+		if statusCode >= 400 || statusCode == -1 {
 			fmt.Printf("%d -> %s\n", statusCode, url)
 		}
 	}
 }
 
-func markIfNew(u string) bool {
-	mapMutex.Lock()
-	defer mapMutex.Unlock()
+func processPage(targetURL string, baseURL *url.URL, isExternal bool, out chan<- PageResult) {
+	res := PageResult{URL: targetURL, IsExternal: isExternal}
 
-	if _, exists := resultMap[u]; exists {
-		return false
-	}
-
-	resultMap[u] = 0
-	return true
-}
-
-func updateStatus(u string, statusCode int) {
-	mapMutex.Lock()
-	defer mapMutex.Unlock()
-	resultMap[u] = statusCode
-}
-
-func get(url string) (*http.Response, error) {
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodGet, targetURL, nil)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to create resquest: %v", err)
+		res.Err = fmt.Errorf("failed to create request: %v", err)
+		out <- res
+		return
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (compatible; Go-Fetcher/1.0)")
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to fetch the URL: %v", err)
-	}
-
-	updateStatus(url, resp.StatusCode)
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("Non-OK HTTP status: %s", resp.Status)
-	}
-
-	return resp, nil
-}
-
-func scrapeLinks(rawURL string, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	if !markIfNew(rawURL) {
-		return
-	}
-
-	u, err := url.Parse(rawURL)
-	if err != nil {
-		log.Printf("failed to parse the url=%q, err=%v\n", rawURL, err)
-		return
-	}
-
-	resp, err := get(rawURL)
-	if err != nil {
-		fmt.Println(err)
+		res.Err = fmt.Errorf("failed to fetch: %v", err)
+		out <- res
 		return
 	}
 	defer resp.Body.Close()
 
-	doc, err := html.Parse(resp.Body)
-	if err != nil {
-		fmt.Printf("Error parsing the html: %v\n", err)
+	res.StatusCode = resp.StatusCode
+
+	// Skip HTML parsing for external links or dead links
+	if isExternal || resp.StatusCode != http.StatusOK {
+		out <- res
 		return
 	}
 
-	traverse(u, doc, wg)
+	doc, err := html.Parse(resp.Body)
+	if err != nil {
+		res.Err = fmt.Errorf("error parsing html: %v", err)
+		out <- res
+		return
+	}
+
+	res.NewLinks = extractLinks(baseURL, doc)
+	out <- res
 }
 
-func traverse(baseURL *url.URL, n *html.Node, wg *sync.WaitGroup) {
-	if n.Type == html.ElementNode && n.Data == "a" {
-		for _, attr := range n.Attr {
-			if attr.Key != "href" {
-				continue
-			}
+func extractLinks(baseURL *url.URL, n *html.Node) []string {
+	var links []string
 
-			fmt.Printf("Anchor tag found -> Href: %s\n", attr.Val)
-			parsedHref, err := url.Parse(attr.Val)
-			if err != nil {
-				continue
-			}
-			resolvedURL := baseURL.ResolveReference(parsedHref).String()
-			resolvedURL = strings.TrimSuffix(strings.Split(resolvedURL, "#")[0], "/")
-
-			if strings.HasPrefix(resolvedURL, baseURL.Scheme+"://"+baseURL.Host) {
-				wg.Add(1)
-				go scrapeLinks(resolvedURL, wg)
-			} else {
-				if markIfNew(resolvedURL) {
-					wg.Add(1)
-					go func(extURL string) {
-						defer wg.Done()
-						if _, err := get(extURL); err != nil {
-							fmt.Println(err)
-						}
-					}(resolvedURL)
+	var traverse func(n *html.Node)
+	traverse = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "a" {
+			for _, attr := range n.Attr {
+				if attr.Key == "href" {
+					parsedHref, err := url.Parse(attr.Val)
+					if err == nil {
+						resolved := baseURL.ResolveReference(parsedHref).String()
+						resolved = strings.TrimSuffix(strings.Split(resolved, "#")[0], "/")
+						links = append(links, resolved)
+					}
+					break
 				}
 			}
 		}
+
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			traverse(c)
+		}
 	}
 
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		traverse(baseURL, c, wg)
-	}
+	traverse(n)
+	return links
 }

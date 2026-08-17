@@ -32,7 +32,7 @@ This webscraper initially should focus on non JS rendered web pages, which requi
 ## Additional Tasks
 
 ### Concurrency
-- [ ] Use concurrency to speed up the process. Running each page processing in it's own go routine, and passing the links through a channel to be then filtered or checked.
+- [x] Use concurrency to speed up the process. Running each page processing in it's own go routine, and passing the links through a channel to be then filtered or checked.
 
 ## Edge Cases
 
