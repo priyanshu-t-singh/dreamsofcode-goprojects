@@ -38,6 +38,6 @@ This webscraper initially should focus on non JS rendered web pages, which requi
 
 There are a number of different edge cases in this task such as:
 
-- [ ] Ensuring that redirects are handled properly
-- [ ] Only checking a page once
-- [ ] Preventing infinite loops from recursion
+- [x] Ensuring that redirects are handled properly
+- [x] Only checking a page once
+- [x] Preventing infinite loops from recursion

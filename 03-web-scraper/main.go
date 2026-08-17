@@ -17,16 +17,28 @@ var client = &http.Client{
 
 var urlMap = make(map[string]bool)
 var deadLinks = make(map[string]bool)
+var otherLinks = make(map[string]bool)
 
 func main() {
 	url := "http://localhost:8080"
 	scrapeLinks(url)
 
 	fmt.Println("-------------------")
+	fmt.Println("All Links")
+	fmt.Println("-------------------")
 	for key := range urlMap {
 		fmt.Println(key)
 	}
 
+	fmt.Println("-------------------")
+	fmt.Println("Other Domain Links")
+	fmt.Println("-------------------")
+	for key := range otherLinks {
+		fmt.Println(key)
+	}
+
+	fmt.Println("-------------------")
+	fmt.Println("Dead Links")
 	fmt.Println("-------------------")
 	for key := range deadLinks {
 		fmt.Println(key)
@@ -105,13 +117,18 @@ func traverse(baseUrl string, n *html.Node) {
 			if strings.HasPrefix(href, "http") {
 				if strings.HasPrefix(href, baseUrl) {
 					scrapeLinks(href)
-				} else {
-					if _, exists := urlMap[href]; exists {
-						fmt.Printf("Url already traversed: %s\n", href)
-					} else {
-						markVisited(href)
-					}
+					continue
 				}
+
+				if _, exists := urlMap[href]; exists {
+					fmt.Printf("Url already traversed: %s\n", href)
+					continue
+				}
+
+				if _, err := get(href); err != nil {
+					fmt.Println(err)
+				}
+				markVisited(href)
 			} else {
 				scrapeLinks(strings.TrimSuffix(baseUrl+href, "/"))
 			}
