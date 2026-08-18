@@ -3,10 +3,13 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"log/slog"
 	"os"
 	"path/filepath"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/pressly/goose/v3"
+	migrations "github.com/priyanshu-t-singh/dreamsofcode-goprojects/04-url-shortener/db"
 )
 
 func Open(dbPath string) (*sql.DB, error) {
@@ -23,29 +26,20 @@ func Open(dbPath string) (*sql.DB, error) {
 
 	// Ping verifies the connection is actually valid
 	if err := db.Ping(); err != nil {
-		return nil, fmt.Errorf("failed to ping database: %w", err)
+		return nil, fmt.Errorf("database unreachable: %w", err)
 	}
 
-	// Create tables if they don't exist
-	schema := `
-	CREATE TABLE urls (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		short_code TEXT NOT NULL UNIQUE COLLATE BINARY,
-		original_url TEXT NOT NULL,
-		clicks INTEGER NOT NULL DEFAULT 0,
-		user_id TEXT DEFAULT NULL,
-		is_active INTEGER NOT NULL DEFAULT 1,
-		expires_at DATETIME DEFAULT NULL,
-		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-	);
-
-	CREATE INDEX idx_urls_short_code ON urls(short_code);
-	CREATE INDEX idx_urls_user_id ON urls(user_id);`
-
-	if _, err := db.Exec(schema); err != nil {
-		return nil, fmt.Errorf("failed to execute schema: %w", err)
+	// Configure Goose
+	goose.SetBaseFS(migrations.MigrationsFS)
+	if err := goose.SetDialect("sqlite3"); err != nil {
+		return nil, fmt.Errorf("failed to set goose dialect: %w", err)
 	}
+
+	slog.Info("running database migrations...")
+	if err := goose.Up(db, "migrations"); err != nil {
+		return nil, fmt.Errorf("failed to run migrations: %w", err)
+	}
+	slog.Info("database migrations completed")
 
 	return db, nil
 }

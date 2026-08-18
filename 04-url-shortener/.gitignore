@@ -1,1 +1,12 @@
-database.sqlite
+# SQLite database files
+*.db
+*.sqlite
+*.sqlite3
+
+# SQLite temporary and journal files (WAL, SHM, Journal)
+*.db-wal
+*.db-shm
+*.db-journal
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
