@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Shortened Link</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --bg: #090d16;
+        --card-bg: rgba(18, 24, 38, 0.75);
+        --border: rgba(255, 255, 255, 0.08);
+        --primary: #6366f1;
+        --primary-hover: #4f46e5;
+        --accent: #10b981;
+        --accent-glow: rgba(16, 185, 129, 0.3);
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: var(--bg);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Ambient background glow */
+      body::before,
+      body::after {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        border-radius: 50%;
+        filter: blur(100px);
+        z-index: 0;
+        opacity: 0.45;
+        pointer-events: none;
+      }
+
+      body::before {
+        background: var(--accent);
+        top: 15%;
+        left: 20%;
+      }
+
+      body::after {
+        background: var(--primary);
+        bottom: 15%;
+        right: 20%;
+      }
+
+      /* Result Card container */
+      .card {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 480px;
+        background: var(--card-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow:
+          0 25px 50px -12px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+
+      .card-header {
+        text-align: center;
+      }
+
+      .icon-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        margin-bottom: 1rem;
+        box-shadow: 0 8px 16px -4px var(--accent-glow);
+      }
+
+      .icon-badge svg {
+        width: 24px;
+        height: 24px;
+        stroke: #ffffff;
+        fill: none;
+        stroke-width: 2.5;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      p {
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin-top: 0.35rem;
+      }
+
+      /* Display Box for Shortened URL */
+      .url-display-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      .copy-box {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 0.4rem 0.4rem 0.4rem 1rem;
+        gap: 0.5rem;
+        transition: border-color 0.2s;
+      }
+
+      .copy-box:hover {
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .shortened-url {
+        flex: 1;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #38bdf8;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        text-decoration: none;
+      }
+
+      .shortened-url:hover {
+        text-decoration: underline;
+      }
+
+      .copy-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.65rem 1rem;
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+
+      .copy-btn:hover {
+        background: var(--primary);
+      }
+
+      .copy-btn svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2;
+      }
+
+      /* Meta Details / Original URL Preview */
+      .details {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        padding: 0.85rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .details span:first-child {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .original-url {
+        font-size: 0.85rem;
+        color: #cbd5e1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* Action Links & Back Button */
+      .actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .btn-secondary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.85rem;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--text-main);
+        text-decoration: none;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-secondary svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="card-header">
+        <div class="icon-badge">
+          <svg
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+        <h1>Link Ready!</h1>
+        <p>Your destination is shortened and ready to share</p>
+      </div>
+
+      <!-- Output Box -->
+      <div class="url-display-group">
+        <span class="label">Shortened URL</span>
+        <div class="copy-box">
+          <a
+            href="{{ .BaseURL }}/{{ .ShortURLId }}"
+            target="_blank"
+            id="shortUrl"
+            class="shortened-url"
+          >
+            {{ .BaseURL }}/{{ .ShortURLId }}
+          </a>
+          <button
+            type="button"
+            class="copy-btn"
+            id="copyBtn"
+            onclick="copyToClipboard()"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path
+                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+              ></path>
+            </svg>
+            <span id="copyText">Copy</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Original Target Meta Preview -->
+      <div class="details">
+        <span>Original URL</span>
+        <div
+          class="original-url"
+          title="https://example.com/very-long-path-name/resources/2026/article/how-to-build-web-apps"
+        >
+          https://example.com/very-long-path-name/resources/2026/article/how-to-build-web-apps
+        </div>
+      </div>
+
+      <!-- Return Action -->
+      <div class="actions">
+        <a href="/" class="btn-secondary">
+          <svg
+            viewBox="0 0 24 24"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          <span>Shorten Another Link</span>
+        </a>
+      </div>
+    </div>
+
+    <script>
+      function copyToClipboard() {
+        const url = document.getElementById("shortUrl").innerText.trim();
+        const copyText = document.getElementById("copyText");
+
+        navigator.clipboard.writeText(url).then(() => {
+          copyText.innerText = "Copied!";
+          setTimeout(() => {
+            copyText.innerText = "Copy";
+          }, 2000);
+        });
+      }
+    </script>
+  </body>
+</html>
