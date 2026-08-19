@@ -6,17 +6,18 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/04-url-shortener/internal/constants"
 	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/04-url-shortener/internal/core/database"
 	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/04-url-shortener/internal/core/logger"
 	"github.com/priyanshu-t-singh/dreamsofcode-goprojects/04-url-shortener/internal/middleware"
+	us "github.com/priyanshu-t-singh/dreamsofcode-goprojects/04-url-shortener/internal/url"
 )
 
 type PageData struct {
-	BaseURL    string
-	ShortURLId string
+	BaseURL     string
+	ShortURLId  string
+	OriginalURL string
 }
-
-var baseURL string = "http://localhost:8080"
 
 func main() {
 	logger.SetupLogger()
@@ -34,11 +35,24 @@ func main() {
 		tmpl.ExecuteTemplate(w, "index.html", PageData{})
 	})
 
+	repo := us.NewRepository(db)
+	urlHandler := us.NewHandler(repo)
+	router.HandleFunc("POST /api/shorten", urlHandler.SaveShortURL)
+	router.HandleFunc("GET /{pageId}", urlHandler.RedirectToOriginalURL)
+
 	router.HandleFunc("GET /r/{pageId}", func(w http.ResponseWriter, r *http.Request) {
-		id := r.PathValue("pageId")
+		pageId := r.PathValue("pageId")
+
+		originalURL, err := repo.GetOriginalURL(pageId)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+
 		tmpl.ExecuteTemplate(w, "result.html", PageData{
-			BaseURL:    baseURL,
-			ShortURLId: id,
+			BaseURL:     constants.BaseURL,
+			OriginalURL: originalURL,
+			ShortURLId:  pageId,
 		})
 	})
 
