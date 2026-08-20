@@ -1,6 +1,6 @@
 package models
 
-type OpenExchangeRatesAPIResponse struct {
+type ExchangeRates struct {
 	Disclaimer string             `json:"disclaimer"`
 	License    string             `json:"license"`
 	Timestamp  int                `json:"timestamp"`
